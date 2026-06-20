@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: movie-ticket-booking-system
+
+  datasource:
+    url: jdbc:h2:file:./data/movieticket;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+app:
+  booking:
+    hold-duration-minutes: 10
+  notification:
+    reminder-hours-before: 2
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-key-change-me-in-production-min-256-bits-long!!}
+    expiration-ms: 86400000
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.movieticket: DEBUG
+    org.springframework.security: INFO

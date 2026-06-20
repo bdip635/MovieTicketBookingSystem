@@ -36,4 +36,6 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, UUID> {
     List<ShowSeat> findExpiredHolds(@Param("status") SeatStatus status, @Param("now") Instant now);
 
     Optional<ShowSeat> findByShowIdAndSeatId(UUID showId, UUID seatId);
+
+    List<ShowSeat> findBySeatHold_Id(UUID seatHoldId);
 }

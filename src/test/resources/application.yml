@@ -4,8 +4,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  task:
+    scheduling:
+      enabled: false
 
 app:
+  booking:
+    hold-duration-minutes: 10
+    hold-expiry-interval-ms: 30000
   jwt:
     secret: test-secret-key-for-unit-and-integration-tests-min-256-bits!!
     expiration-ms: 3600000

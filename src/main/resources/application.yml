@@ -32,6 +32,7 @@ server:
 app:
   booking:
     hold-duration-minutes: 10
+    hold-expiry-interval-ms: 30000
   notification:
     reminder-hours-before: 2
   jwt:

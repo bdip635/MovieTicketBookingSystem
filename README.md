@@ -166,6 +166,9 @@ Base path: `/api/v1`
 |--------|------|-------------|
 | POST | `/auth/register` | Register customer |
 | POST | `/auth/login` | Login; returns JWT |
+| GET | `/auth/me` | Current user profile (authenticated) |
+
+**Default admin (seeded on startup):** `admin@movieticket.com` / `admin123`
 
 ### Admin
 
@@ -250,6 +253,11 @@ mvn test
 ## Project Structure
 
 ```
+AGENTS.md              AI agent workflow and conventions
+docs/
+├── ARCHITECTURE.md
+├── skills-used.md     Cursor skills referenced during development
+└── raw/               Raw planning notes from AI sessions
 src/main/java/com/movieticket/
 ├── config/          Security, JWT, async, scheduling
 ├── domain/          JPA entities and enums
@@ -271,7 +279,7 @@ src/main/java/com/movieticket/
 1. ✅ Requirements and architecture documentation
 2. ✅ Project scaffold + Flyway schema
 3. ✅ JPA entities and repositories
-4. Auth + RBAC
+4. ✅ Auth + RBAC
 5. Admin catalog APIs
 6. Customer browse + seat map
 7. Hold + expiry job

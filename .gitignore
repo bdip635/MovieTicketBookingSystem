@@ -6,4 +6,4 @@ data/
 *.class
 *.jar
 *.war
-.env
+.vscode/

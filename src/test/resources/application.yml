@@ -4,3 +4,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+app:
+  jwt:
+    secret: test-secret-key-for-unit-and-integration-tests-min-256-bits!!
+    expiration-ms: 3600000

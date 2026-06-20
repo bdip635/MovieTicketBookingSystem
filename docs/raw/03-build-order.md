@@ -6,7 +6,7 @@ Agreed implementation sequence:
 2. ✅ Project scaffold + Flyway schema
 3. ✅ JPA entities and repositories
 4. ✅ Auth + RBAC (JWT, seed admin, exception handler)
-5. Admin catalog APIs
+5. ✅ Admin catalog APIs
 6. Customer browse + seat map
 7. Hold + expiry job
 8. Pricing + discount strategies + mock payment + confirm

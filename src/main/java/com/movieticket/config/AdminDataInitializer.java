@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class AdminDataInitializer implements ApplicationRunner {
 
-    static final String ADMIN_EMAIL = "admin@movieticket.com";
-    static final String ADMIN_PASSWORD = "admin123";
+    public static final String ADMIN_EMAIL = "admin@movieticket.com";
+    public static final String ADMIN_PASSWORD = "admin123";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

@@ -2,6 +2,7 @@ package com.movieticket;
 
 import com.movieticket.config.BookingProperties;
 import com.movieticket.config.JwtProperties;
+import com.movieticket.config.NotificationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -11,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
-@EnableConfigurationProperties({JwtProperties.class, BookingProperties.class})
+@EnableConfigurationProperties({JwtProperties.class, BookingProperties.class, NotificationProperties.class})
 public class MovieTicketApplication {
 
     public static void main(String[] args) {

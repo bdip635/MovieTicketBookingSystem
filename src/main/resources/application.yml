@@ -35,6 +35,8 @@ app:
     hold-expiry-interval-ms: 30000
   notification:
     reminder-hours-before: 2
+    reminder-window-minutes: 15
+    reminder-check-interval-ms: 300000
   jwt:
     secret: ${JWT_SECRET:dev-secret-key-change-me-in-production-min-256-bits-long!!}
     expiration-ms: 86400000

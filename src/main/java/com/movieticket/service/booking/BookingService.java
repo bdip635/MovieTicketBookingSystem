@@ -4,19 +4,23 @@ import com.movieticket.domain.entity.*;
 import com.movieticket.domain.enums.BookingStatus;
 import com.movieticket.domain.enums.HoldStatus;
 import com.movieticket.domain.enums.PaymentStatus;
+import com.movieticket.domain.enums.RefundStatus;
 import com.movieticket.domain.enums.SeatStatus;
 import com.movieticket.exception.ApiException;
 import com.movieticket.repository.BookingRepository;
 import com.movieticket.repository.DiscountCodeRepository;
+import com.movieticket.repository.RefundPolicyRepository;
 import com.movieticket.repository.SeatHoldRepository;
 import com.movieticket.repository.ShowSeatRepository;
-import com.movieticket.service.notification.NotificationService;
 import com.movieticket.service.payment.MockPaymentService;
 import com.movieticket.service.payment.PaymentResult;
 import com.movieticket.service.pricing.DiscountContext;
 import com.movieticket.service.pricing.DiscountResult;
 import com.movieticket.service.pricing.DiscountService;
+import com.movieticket.service.refund.RefundCalculation;
+import com.movieticket.service.refund.RefundPolicyEngine;
 import com.movieticket.web.dto.booking.BookingResponse;
+import com.movieticket.web.dto.booking.CancelBookingResponse;
 import com.movieticket.web.dto.booking.ConfirmHoldRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -40,6 +44,8 @@ public class BookingService {
     private final DiscountCodeRepository discountCodeRepository;
     private final DiscountService discountService;
     private final MockPaymentService mockPaymentService;
+    private final RefundPolicyRepository refundPolicyRepository;
+    private final RefundPolicyEngine refundPolicyEngine;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -132,6 +138,80 @@ public class BookingService {
                 .toList();
     }
 
+    @Transactional
+    public CancelBookingResponse cancelBooking(UUID bookingId, UUID userId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .filter(b -> b.getUser().getId().equals(userId))
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
+
+        if (booking.getStatus() != BookingStatus.CONFIRMED) {
+            throw new ApiException(HttpStatus.CONFLICT, "Booking is already cancelled");
+        }
+
+        if (booking.getRefund() != null) {
+            throw new ApiException(HttpStatus.CONFLICT, "Booking has already been refunded");
+        }
+
+        List<ShowSeat> showSeats = showSeatRepository.findByIdInForUpdate(
+                booking.getSeats().stream()
+                        .map(bookingSeat -> bookingSeat.getShowSeat().getId())
+                        .toList());
+
+        Show show = booking.getShow();
+        UUID theaterId = show.getScreen().getTheater().getId();
+        RefundPolicy policy = refundPolicyRepository
+                .findFirstByTheaterIdAndActiveTrueOrderByCreatedAtDesc(theaterId)
+                .orElse(null);
+
+        RefundCalculation calculation = refundPolicyEngine.compute(
+                policy, show.getStartTime(), Instant.now());
+        BigDecimal refundAmount = refundPolicyEngine.calculateRefundAmount(
+                booking.getFinalAmount(), calculation.refundPercentage());
+
+        Payment payment = booking.getPayment();
+        mockPaymentService.processRefund(payment.getTransactionId(), refundAmount);
+
+        Refund refund = Refund.builder()
+                .booking(booking)
+                .payment(payment)
+                .refundAmount(refundAmount)
+                .refundPercentage(calculation.refundPercentage())
+                .status(RefundStatus.PROCESSED)
+                .build();
+        booking.setRefund(refund);
+
+        if (refundAmount.compareTo(BigDecimal.ZERO) == 0) {
+            payment.setStatus(PaymentStatus.SUCCESS);
+        } else if (refundAmount.compareTo(booking.getFinalAmount()) >= 0) {
+            payment.setStatus(PaymentStatus.REFUNDED);
+        } else {
+            payment.setStatus(PaymentStatus.PARTIALLY_REFUNDED);
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+
+        for (ShowSeat showSeat : showSeats) {
+            showSeat.setStatus(SeatStatus.AVAILABLE);
+            showSeat.setHeldByUser(null);
+            showSeat.setHoldExpiresAt(null);
+            showSeat.setSeatHold(null);
+        }
+
+        showSeatRepository.saveAll(showSeats);
+        bookingRepository.save(booking);
+
+        eventPublisher.publishEvent(new BookingCancelledEvent(booking.getId()));
+
+        return new CancelBookingResponse(
+                booking.getId(),
+                booking.getStatus(),
+                booking.getFinalAmount(),
+                refundAmount,
+                calculation.refundPercentage(),
+                refund.getStatus()
+        );
+    }
+
     private void validateActiveHold(SeatHold hold) {
         if (hold.getStatus() != HoldStatus.ACTIVE) {
             throw new ApiException(HttpStatus.CONFLICT, "Hold is no longer active");
@@ -197,7 +277,20 @@ public class BookingService {
                 discountDescription,
                 booking.getPayment().getTransactionId(),
                 booking.getCreatedAt(),
+                toRefundInfo(booking),
                 seats
+        );
+    }
+
+    private BookingResponse.RefundInfo toRefundInfo(Booking booking) {
+        if (booking.getRefund() == null) {
+            return null;
+        }
+        Refund refund = booking.getRefund();
+        return new BookingResponse.RefundInfo(
+                refund.getRefundAmount(),
+                refund.getRefundPercentage(),
+                refund.getStatus()
         );
     }
 

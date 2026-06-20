@@ -22,4 +22,8 @@ public class MockPaymentService {
                 null
         );
     }
+
+    public void processRefund(String transactionId, BigDecimal amount) {
+        // Mock gateway — always succeeds
+    }
 }

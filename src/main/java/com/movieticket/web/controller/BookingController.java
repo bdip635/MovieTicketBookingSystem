@@ -3,6 +3,7 @@ package com.movieticket.web.controller;
 import com.movieticket.security.SecurityUtils;
 import com.movieticket.service.booking.BookingService;
 import com.movieticket.web.dto.booking.BookingResponse;
+import com.movieticket.web.dto.booking.CancelBookingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,5 +25,10 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public BookingResponse getBooking(@PathVariable UUID bookingId) {
         return bookingService.getBooking(bookingId, SecurityUtils.currentUserId());
+    }
+
+    @PostMapping("/{bookingId}/cancel")
+    public CancelBookingResponse cancelBooking(@PathVariable UUID bookingId) {
+        return bookingService.cancelBooking(bookingId, SecurityUtils.currentUserId());
     }
 }

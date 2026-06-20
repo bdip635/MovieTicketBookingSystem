@@ -1,6 +1,7 @@
 package com.movieticket.web.dto.booking;
 
 import com.movieticket.domain.enums.BookingStatus;
+import com.movieticket.domain.enums.RefundStatus;
 import com.movieticket.domain.enums.SeatTier;
 
 import java.math.BigDecimal;
@@ -22,8 +23,16 @@ public record BookingResponse(
         String discountDescription,
         String paymentTransactionId,
         Instant createdAt,
+        RefundInfo refund,
         List<BookingSeatLine> seats
 ) {
+    public record RefundInfo(
+            BigDecimal refundAmount,
+            BigDecimal refundPercentage,
+            RefundStatus status
+    ) {
+    }
+
     public record BookingSeatLine(
             UUID showSeatId,
             UUID seatId,

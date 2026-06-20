@@ -9,7 +9,7 @@ Agreed implementation sequence:
 5. ✅ Admin catalog APIs
 6. ✅ Customer browse + seat map
 7. ✅ Hold + expiry job
-8. Pricing + discount strategies + mock payment + confirm
+8. ✅ Pricing + discount strategies + mock payment + confirm
 9. Cancel + refund policy engine
 10. Async notifications + reminder job
 11. Integration tests + seed data for demo

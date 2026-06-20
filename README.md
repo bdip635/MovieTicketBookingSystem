@@ -284,6 +284,6 @@ src/main/java/com/movieticket/
 6. ✅ Customer browse + seat map
 7. ✅ Hold + expiry job
 8. ✅ Pricing + discount + payment + confirm
-9. Cancel + refund
-10. Async notifications + reminder job
+9. ✅ Cancel + refund
+10. ✅ Async notifications + reminder job
 11. Tests + seed data

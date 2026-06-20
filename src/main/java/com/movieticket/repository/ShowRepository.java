@@ -24,4 +24,12 @@ public interface ShowRepository extends JpaRepository<Show, UUID> {
             @Param("cityId") UUID cityId,
             @Param("from") Instant from,
             @Param("to") Instant to);
+
+    @Query("""
+            SELECT s FROM Show s
+            WHERE s.startTime >= :from
+              AND s.startTime < :to
+            ORDER BY s.startTime ASC
+            """)
+    List<Show> findByStartTimeBetween(@Param("from") Instant from, @Param("to") Instant to);
 }

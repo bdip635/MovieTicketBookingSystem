@@ -281,8 +281,8 @@ src/main/java/com/movieticket/
 3. ✅ JPA entities and repositories
 4. ✅ Auth + RBAC
 5. ✅ Admin catalog APIs
-6. Customer browse + seat map
-7. Hold + expiry job
+6. ✅ Customer browse + seat map
+7. ✅ Hold + expiry job
 8. Pricing + discount + payment + confirm
 9. Cancel + refund
 10. Async notifications + reminder job
